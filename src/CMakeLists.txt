@@ -1,0 +1,10 @@
+add_executable(nsweeper main.cpp nsweepergame.cpp)
+target_include_directories(nsweeper PRIVATE .)
+target_link_libraries(nsweeper PRIVATE imtui-ncurses)
+
+if(imtui-examples-common)
+  target_compile_definitions(nsweeper PRIVATE IMTUI_HAS_EXAMPLES=1)
+  target_link_libraries(nsweeper PRIVATE imtui-examples-common)
+else()
+  target_compile_definitions(nsweeper PRIVATE IMTUI_HAS_EXAMPLES=0)
+endif()

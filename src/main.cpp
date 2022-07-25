@@ -32,6 +32,7 @@ int main()
 {
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
+  ImGui::GetIO().IniFilename = NULL;
 
   auto screen = ImTui_ImplNcurses_Init(true);
   ImTui_ImplText_Init();
@@ -49,8 +50,10 @@ int main()
 
       showMainMenuBar();
 
-      ImGui::SetNextWindowPos(ImVec2(0, 1), ImGuiCond_Once);
+      // ImGui::SetNextWindowPos(ImVec2(0, 1), ImGuiCond_Once);
       ImGui::SetNextWindowSize(ImVec2(20, 10), ImGuiCond_Once);
+      ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+      ImGui::SetNextWindowPos(center, ImGuiCond_Once, ImVec2(0.5f, 0.5f));
       handleGame(activeGame);
 
       // ImGui::SetNextWindowPos(ImVec2(35, 1), ImGuiCond_Once);
@@ -183,6 +186,7 @@ static void handleGame(std::unique_ptr<NSweeperGame> &activeGame)
     for (int x = 0; x < activeGame->getBoardWidth(); x++)
     {
       auto cell = activeGame->getGameCell(x, y);
+
       if (cell == NSweeperGame::CellType::Mines_0 || cell == NSweeperGame::CellType::Hidden || cell == NSweeperGame::CellType::Invalid)
       {
         buffer[0] = ' ';
@@ -191,6 +195,7 @@ static void handleGame(std::unique_ptr<NSweeperGame> &activeGame)
       {
         buffer[0] = (char)cell;
       }
+
       ImU32 col;
       if (hovering && (x == tilesIndex.x && y == tilesIndex.y))
       {
@@ -202,7 +207,7 @@ static void handleGame(std::unique_ptr<NSweeperGame> &activeGame)
         {
         case NSweeperGame::CellType::Flag:
         {
-          if (activeGame->isGameWon())
+          if (activeGame->isFlagCorrectlyPlaced(x, y))
           {
             col = flagCol;
           }
@@ -235,10 +240,9 @@ static void handleGame(std::unique_ptr<NSweeperGame> &activeGame)
   }
   if (ImGui::CollapsingHeader("Settings"))
   {
-    ImGui::DragScalar("Width", ImGuiDataType_U8, &gameSettings.width,  0.2,  NULL,  NULL, "%u");
-    ImGui::DragScalar("Height", ImGuiDataType_U8, &gameSettings.height,  0.2,  NULL,  NULL, "%u");
-    ImGui::DragScalar("Mines", ImGuiDataType_U8, &gameSettings.numberOfMines,  0.2,  NULL,  NULL, "%u");
-        
+    ImGui::DragScalar("Width", ImGuiDataType_U8, &gameSettings.width, 0.2, NULL, NULL, "%u");
+    ImGui::DragScalar("Height", ImGuiDataType_U8, &gameSettings.height, 0.2, NULL, NULL, "%u");
+    ImGui::DragScalar("Mines", ImGuiDataType_U8, &gameSettings.numberOfMines, 0.2, NULL, NULL, "%u");
   }
   ImGui::Text("Remaining mines: %d", activeGame->getAvailableFlags());
   if (activeGame->isGameLost())
@@ -250,11 +254,11 @@ static void handleGame(std::unique_ptr<NSweeperGame> &activeGame)
     ImGui::Text("U WON!!! CHEATER!!!");
   }
 
-  if (ImGui::Button("Reset", {ImGui::GetContentRegionAvail().x, 1}))
+  if (ImGui::Button("Reset", {screenSize.x, 1}))
   {
     activeGame = std::make_unique<NSweeperGame>(gameSettings.width, gameSettings.height, gameSettings.numberOfMines);
   }
-  if (ImGui::Button("I'm scared, quit", {ImGui::GetContentRegionAvail().x, 1}))
+  if (ImGui::Button("I'm scared, quit", {screenSize.x, 1}))
   {
     windowShallClose = true;
   }

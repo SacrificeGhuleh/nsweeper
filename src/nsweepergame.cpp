@@ -199,3 +199,11 @@ int NSweeperGame::getTotalNumberOfMines() const { return totalNumberOfMines; }
 int NSweeperGame::getAvailableFlags() const { return availableFlags; }
 bool NSweeperGame::isGameLost() const { return gameLost; }
 bool NSweeperGame::isGameWon() const { return foundMines == totalNumberOfMines; }
+bool NSweeperGame::isFlagCorrectlyPlaced(int x, int y) const
+{
+  if (!isGameLost() && !isGameWon())
+  {
+    return false;
+  }
+  return getGameCellInternal(x, y) == CellType::FlagMine;
+}

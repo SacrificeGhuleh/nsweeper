@@ -37,6 +37,7 @@ public:
   bool interactFlag(int x, int y);
   bool isGameLost() const;
   bool isGameWon() const;
+  bool isFlagCorrectlyPlaced(int x, int y) const;
 
 private:
   const int boardWidth;
